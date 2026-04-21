@@ -1,0 +1,6 @@
+matrices/
+data/
+pharmebinet/pharmebinet.dump
+.venv/
+*.pyc
+__pycache__/
