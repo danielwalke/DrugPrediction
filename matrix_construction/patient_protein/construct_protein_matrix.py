@@ -15,8 +15,9 @@ with driver.session() as session:
         RETURN p.name AS patient_name, q.name AS protein_name, r.regulation AS weight
         """).to_df().dropna()
 result['weight'] = result['weight'].replace({"Down": -1, "Up": 1})
-patient_protein_vector = []
+
 for patient_name, df_group in result.groupby('patient_name'):
+    patient_protein_vector = []
     protein_name_to_weight_dict = dict(zip(df_group['protein_name'], df_group['weight']))
     for protein_name in protein_rows:
         patient_protein_vector.append(protein_name_to_weight_dict.get(protein_name, 0))
