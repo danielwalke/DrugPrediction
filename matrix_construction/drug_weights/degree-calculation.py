@@ -1,6 +1,7 @@
 import json
 from neo4j import GraphDatabase
 import os
+import sys
 
 def process_compound_metrics(uri, user, password, input_file, output_file):
     with open(input_file, 'r') as f:
@@ -37,10 +38,16 @@ def process_compound_metrics(uri, user, password, input_file, output_file):
 
 if __name__ == "__main__":
     os.makedirs(os.path.expanduser('./matrices/drug_weights/'), exist_ok=True)
+    if len(sys.argv) != 3:
+        print("Usage: python degree-calculation.py <input_file_path> <output_file_path>")
+        sys.exit(1)
+    input_file_path = sys.argv[1]
+    output_file_path = sys.argv[2]
+    print(f"Processing compound metrics with input: {input_file_path} and output: {output_file_path}")
     process_compound_metrics(
         "bolt://localhost:7683",
         "neo4j",
         "password",
-        os.path.expanduser("./matrices/protein_drug/compound_rows.json"),
-        os.path.expanduser("./matrices/drug_weights/compound_metrics.json")
+        os.path.expanduser(input_file_path),
+        os.path.expanduser(output_file_path)
     )

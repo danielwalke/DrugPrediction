@@ -1,0 +1,20 @@
+[
+  {
+    "connectionType": "UPREGULATES_CHuG",
+    "matrixValue": 1,
+    "directionalEffect": "Increasing",
+    "reasoning": "Directly promotes or increases the transcription and expression levels of the target gene."
+  },
+  {
+    "connectionType": "DOWNREGULATES_CHdG",
+    "matrixValue": -1,
+    "directionalEffect": "Decreasing",
+    "reasoning": "Directly reduces or represses the transcription and expression levels of the target gene."
+  },
+  {
+    "connectionType": "BINDS_CHbG",
+    "matrixValue": 0,
+    "directionalEffect": "Physical only",
+    "reasoning": "Confirms physical attachment to the gene or its regulatory elements, but does not specify whether the binding activates or represses transcription."
+  }
+]
