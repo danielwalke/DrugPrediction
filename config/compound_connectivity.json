@@ -1,0 +1,87 @@
+[
+  {
+    "connectionType": "UPREGULATES_CHuP",
+    "matrixValue": 1,
+    "directionalEffect": "Increasing",
+    "reasoning": "Directly increases the expression or activity of the protein."
+  },
+  {
+    "connectionType": "MIMICS_CHmP",
+    "matrixValue": 1,
+    "directionalEffect": "Increasing",
+    "reasoning": "Acts as an agonist, stimulating and activating the protein's function."
+  },
+  {
+    "connectionType": "DOWNREGULATES_CHdP",
+    "matrixValue": -1,
+    "directionalEffect": "Decreasing",
+    "reasoning": "Directly reduces the expression or signaling of the protein."
+  },
+  {
+    "connectionType": "INHIBITS_CHiP",
+    "matrixValue": -1,
+    "directionalEffect": "Decreasing",
+    "reasoning": "Blocks or neutralizes the protein's normal biological activity."
+  },
+  {
+    "connectionType": "DEGENERATES_CHdP",
+    "matrixValue": -1,
+    "directionalEffect": "Decreasing",
+    "reasoning": "Actively destroys, cleaves, or degrades the target protein."
+  },
+  {
+    "connectionType": "IS_ACTIVE_AS_ANTIBODY_CHiaaaP",
+    "matrixValue": -1,
+    "directionalEffect": "Decreasing",
+    "reasoning": "While technically context-dependent, most therapeutic antibodies are designed to neutralize or block their target."
+  },
+  {
+    "connectionType": "REGULATES_CHrP",
+    "matrixValue": 0,
+    "directionalEffect": "Unknown / Variable",
+    "reasoning": "Indicates modulation, but the dataset does not specify if it goes up (+1) or down (-1)."
+  },
+  {
+    "connectionType": "BINDS_CHbP",
+    "matrixValue": 0,
+    "directionalEffect": "Physical only",
+    "reasoning": "Confirms attachment, but does not indicate if it activates or inhibits."
+  },
+  {
+    "connectionType": "INTERACTS_CHiP",
+    "matrixValue": 0,
+    "directionalEffect": "Physical only",
+    "reasoning": "Broad physical relationship with no directional consequence defined."
+  },
+  {
+    "connectionType": "ASSOCIATES_CHaP",
+    "matrixValue": 0,
+    "directionalEffect": "Correlation only",
+    "reasoning": "Indicates a biological link without defining the mechanism or direction."
+  },
+  {
+    "connectionType": "IS_ACTIVE_ON_DNA_OR_RNA_LEVEL_CHiaodorlP",
+    "matrixValue": 0,
+    "directionalEffect": "Mechanism only",
+    "reasoning": "Targets the genetic blueprint, but could result in either more or less protein."
+  },
+  {
+    "connectionType": "IS_ACTIVE_ON_POLYPEPTIDE_LEVEL_CHiaoplP",
+    "matrixValue": 0,
+    "directionalEffect": "Mechanism only",
+    "reasoning": "Alters folding/structure, but the functional outcome (+1 or -1) requires more context."
+  },
+  {
+    "connectionType": "IS_ACTIVE_ON_CELLULAR_LEVEL_CHiaoclP",
+    "matrixValue": 0,
+    "directionalEffect": "Mechanism only",
+    "reasoning": "Affects cellular trafficking or localization without a strict up/down label."
+  },
+  {
+    "connectionType": "IS_ACTIVE_IN_METABOLISM_CHiaimP",
+    "matrixValue": 0,
+    "directionalEffect": "Mechanism only",
+    "reasoning": "Involves metabolic pathways where the direction of the effect varies."
+  }
+]
+
