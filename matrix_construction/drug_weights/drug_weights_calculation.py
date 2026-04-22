@@ -22,10 +22,10 @@ with open(os.path.expanduser(input_file_path_compound_rows), 'r') as f:
 
 weights = []
 for comp in compound_rows:
-    weight = 1 / (1 + compound_metrics[comp]["out_degree"])
+    weight = 1 / np.sqrt(compound_metrics[comp]["out_degree"] + 1)
     weights.append(weight)
 weights = np.array(weights)
-weights = weights / np.sum(weights)
+weights = weights
 print(pd.DataFrame({'compound': compound_rows, 'weight': weights}).describe())
 np.save(os.path.expanduser(output_file_path), weights)
 
