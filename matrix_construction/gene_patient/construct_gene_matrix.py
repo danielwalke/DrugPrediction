@@ -12,7 +12,19 @@ patient_gene_matrix = []
 with driver.session() as session:
     result = session.run("""
         MATCH (p:Patient)-[r]->(q:Gene)
-        RETURN p.name AS patient_name, q.name AS gene_name, r.regulation AS weight
+        WITH p, q,
+            CASE r.regulation
+                WHEN 'Up' THEN 1.0
+                WHEN 'Down' THEN -1.0
+                ELSE 0.0
+            END AS base_weight,
+            COUNT { (:Compound)-[]->(q) } AS compound_indegree
+        RETURN p.name AS patient_name,
+            q.name AS gene_name,
+            CASE 
+                WHEN compound_indegree = 0 THEN base_weight 
+                ELSE base_weight / compound_indegree 
+            END AS weight
         """).to_df().dropna()
 result['weight'] = result['weight'].replace({"Down": -1, "Up": 1})
 
