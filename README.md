@@ -123,3 +123,8 @@ Investigate Neo4j Results
 MATCH path=(d:Compound)-[]-(p)-[]-(n:Patient) 
 WHERE d.name = "Dabrafenib" AND ("Gene" IN labels(p) OR "Protein" IN labels(p)) 
 RETURN path
+
+
+MATCH path=(d:Compound)-[]-(p)-[]-(n:Patient) 
+WHERE d.name = "Pyrophosphate 2-" AND ("Gene" IN labels(p) OR "Protein" IN labels(p)) 
+RETURN path
