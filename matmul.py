@@ -21,6 +21,7 @@ compound_rows_path = sys.argv[4]
 output_drug_scores_path = sys.argv[5]
 
 patient_protein_matrix = np.load(os.path.expanduser(patient_protein_matrix_path))
+patient_degree_vector= np.sum(patient_protein_matrix != 0, axis=1)
 drug_weights = np.load(os.path.expanduser(drug_weights_path))
 protein_drug_matrix = np.load(os.path.expanduser(protein_drug_matrix_path)).transpose()
 
@@ -28,7 +29,7 @@ print("Patient-Features Matrix Shape:", patient_protein_matrix.shape)
 print("Drug Weights Shape:", drug_weights.shape)
 print("Features Drug Matrix Shape:", protein_drug_matrix.shape)
 
-weighted_protein_drug_matrix = protein_drug_matrix #* drug_weights
+weighted_protein_drug_matrix = protein_drug_matrix * np.sqrt(patient_degree_vector) *drug_weights 
 
 patient_drug_matrix = np.matmul(patient_protein_matrix, weighted_protein_drug_matrix)
 print("Patient-Drug Matrix Shape:", patient_drug_matrix.shape)
