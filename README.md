@@ -118,3 +118,8 @@ python combined_score_analysis.py
 
 This will output a JSON file containing the combined results, located at:
 `./matrices/drug_scores/combined_drugs.json`
+
+Investigate Neo4j Results
+MATCH path=(d:Compound)-[]-(p)-[]-(n:Patient) 
+WHERE d.name = "Dabrafenib" AND ("Gene" IN labels(p) OR "Protein" IN labels(p)) 
+RETURN path
