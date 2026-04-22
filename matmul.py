@@ -41,7 +41,7 @@ sorted_idx_drugs = np.argsort(patient_drug_matrix, axis=1)[0]
 with open(os.path.expanduser(compound_rows_path), 'r') as f:
     compound_rows = json.load(f)
 print(sorted_idx_drugs)
-drug_scores = dict(zip(resort(compound_rows, sorted_idx_drugs), list(map(int, patient_drug_matrix[0, sorted_idx_drugs]))))
+drug_scores = dict(zip(resort(compound_rows, sorted_idx_drugs), list(map(float, patient_drug_matrix[0, sorted_idx_drugs]))))
 with open(os.path.expanduser(output_drug_scores_path), 'w') as f:
     json.dump(drug_scores, f, indent=4)
 for i, idx in enumerate(sorted_idx_drugs):

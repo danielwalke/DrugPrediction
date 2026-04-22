@@ -26,7 +26,6 @@ with driver.session() as session:
                 ELSE base_weight / compound_indegree 
             END AS weight
         """).to_df().dropna()
-result['weight'] = result['weight'].replace({"Down": -1, "Up": 1})
 
 for patient_name, df_group in result.groupby('patient_name'):
     patient_gene_vector = []

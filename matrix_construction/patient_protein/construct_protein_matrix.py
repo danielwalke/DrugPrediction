@@ -23,10 +23,9 @@ with driver.session() as session:
             q.name AS protein_name,
             CASE 
                 WHEN compound_indegree = 0 THEN base_weight 
-                ELSE base_weight / compound_indegree 
+                ELSE base_weight / compound_indegree
             END AS weight
         """).to_df().dropna()
-result['weight'] = result['weight'].replace({"Down": -1, "Up": 1})
 
 for patient_name, df_group in result.groupby('patient_name'):
     patient_protein_vector = []
