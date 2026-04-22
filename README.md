@@ -141,7 +141,7 @@ The four fields, in plain terms:
 
 ### Why two combined scores?
 
-The two raw channels live on different scales. The protein graph has ~14 distinct relation types and is much denser than the gene graph (~3 relation types), so `std(protein_score) ≫ std(gene_score)` in practice. If you just averaged them (as the legacy code did), the protein channel would dominate: a drug that is average in proteins but excellent in genes would lose to a drug that is merely average in proteins, because "average in proteins" already has more absolute magnitude than "excellent in genes".
+The two raw channels live on different scales. The protein graph has ~14 distinct relation types and is much denser than the gene graph (~3 relation types), so `std(protein_score) ≫ std(gene_score)` in practice. If you just averaged them, the protein channel would dominate: a drug that is average in proteins but excellent in genes would lose to a drug that is merely average in proteins, because "average in proteins" already has more absolute magnitude than "excellent in genes".
 
 `zscore_combined` and `rrf_combined` are two principled ways to put the channels on equal footing. They almost always agree at the top of the ranking, but they weight the tail differently.
 
@@ -196,7 +196,7 @@ The pipeline exposes three optional environment variables. All have sensible def
 | Variable | Default | Values | Effect |
 | --- | --- | --- | --- |
 | `PENALIZE_HUB` | `log` | `log`, `linear`, `none` | Per-feature IDF weighting on the patient vectors. `log` is the standard smoothed IDF `log((N_C+1)/(df+1))+1`. `linear` reproduces the legacy `1/df`. `none` disables it. |
-| `DEGREE_SCOPE` | `targets` | `targets`, `all` | Which edges count towards the drug specificity prior `w_d = 1/√(out_degree+1)`. `targets` counts only edges to `:Compound`, `:Protein` and `:Gene` (recommended). `all` counts every label (legacy). |
+| `DEGREE_SCOPE` | `targets` | `targets`, `all` | Which edges count towards the drug specificity prior `w_d = 1/√(out_degree+1)`. `targets` counts only edges to `:Compound`, `:Protein` and `:Gene` (recommended). `all` counts every label. |
 | `N_PERM` | `0` | non-negative integer | If > 0, `matmul.py` also writes a permutation-null z-score per drug to `<output>.z.json`. Shuffles only the ± signs on the patient's support, holding the support fixed. Complements the drug-size prior — large negative z means "sign alignment with this drug is much better than chance". 200–1000 is typical. |
 
 Example:
