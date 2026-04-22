@@ -118,10 +118,76 @@ python combined_score_analysis.py
 
 This writes two files to `./matrices/drug_scores/`:
 
-* `combined_drugs.json` — sorted ascending by z-score-averaged score (lowest = best, same convention as the raw channel scores).
-* `combined_drugs_rrf.json` — sorted descending by Reciprocal Rank Fusion (highest = best). Recommended as the final ranking.
+* `combined_drugs.json` — sorted ascending by `zscore_combined` (lowest = best, same sign convention as the raw channel scores).
+* `combined_drugs_rrf.json` — sorted descending by `rrf_combined` (highest = best). Recommended as the final ranking.
 
-See the docstring at the top of `combined_score_analysis.py` for the math.
+Each drug entry looks like:
+
+```json
+"SomeDrugName": {
+    "zscore_combined": -4.5578,
+    "rrf_combined":     0.01645,
+    "protein_score":   -3.1021,
+    "gene_score":      -0.8842
+}
+```
+
+The four fields, in plain terms:
+
+* `protein_score` — the raw score `S(q, d)` from the protein pipeline (sum of signed, IDF-weighted feature agreement, scaled by the drug specificity prior). Lower = better.
+* `gene_score` — the raw score `S(q, d)` from the gene pipeline. Lower = better.
+* `zscore_combined` — the two raw scores put on a common scale, then averaged. Lower = better.
+* `rrf_combined` — the two raw scores converted to ranks, then fused. Higher = better.
+
+### Why two combined scores?
+
+The two raw channels live on different scales. The protein graph has ~14 distinct relation types and is much denser than the gene graph (~3 relation types), so `std(protein_score) ≫ std(gene_score)` in practice. If you just averaged them (as the legacy code did), the protein channel would dominate: a drug that is average in proteins but excellent in genes would lose to a drug that is merely average in proteins, because "average in proteins" already has more absolute magnitude than "excellent in genes".
+
+`zscore_combined` and `rrf_combined` are two principled ways to put the channels on equal footing. They almost always agree at the top of the ranking, but they weight the tail differently.
+
+### `zscore_combined` — standardise, then average
+
+For each channel `c ∈ {protein, gene}`, compute the mean `μ_c` and standard deviation `σ_c` of that channel's raw scores across all drugs. Standardise:
+
+```
+z_c(d) = (S_c(d) − μ_c) / σ_c
+```
+
+`z_c(d)` is the number of standard deviations drug `d` is below (or above) the channel mean. Because each channel has been standardised, both channels contribute the same spread to the combined score. Then average:
+
+```
+zscore_combined(d) = 0.5 · z_protein(d) + 0.5 · z_gene(d)
+```
+
+Interpretation: "this drug is on average this many σ below the mean of each channel". `-4.56` means roughly 4.56 standard deviations below the mean when averaged across the two channels — strong, interpretable evidence that `d` is unusually good at opposing the patient's dysregulation in both modalities.
+
+Sign convention: lower = better, matching the raw scores.
+
+### `rrf_combined` — Reciprocal Rank Fusion
+
+For each channel `c`, rank the drugs from best (rank 1, the most-negative raw score) to worst. Then:
+
+```
+rrf_combined(d) = Σ_c  1 / (k + rank_c(d)),        k = 60
+```
+
+The constant `k = 60` is the standard choice in information retrieval. It controls how sharply the top of each ranking is rewarded: with `k = 60`, rank 1 contributes `1/61 ≈ 0.0164`, rank 2 contributes `1/62 ≈ 0.0161`, rank 100 contributes `1/160 ≈ 0.0063`, rank 10000 contributes `1/10060 ≈ 0.0001`. The maximum achievable RRF is `2 / 61 ≈ 0.0328` (rank 1 in both channels). `0.01645` in the example above means the drug is rank 1 in one channel and very low in the other, or middle-of-the-pack in both.
+
+RRF uses only the *order* of drugs, not the raw magnitudes. That makes it:
+
+* **Scale-free** — irrelevant how wide each channel's distribution is.
+* **Outlier-robust** — one channel having a single pathological score doesn't shift the ranking.
+* **Less informative** when you want to talk about "how much better than average" a drug is (use `zscore_combined` for that).
+
+Sign convention: higher = better.
+
+### Which should I use?
+
+The recommended ranking is `rrf_combined` — it is the standard IR combiner and is robust to the scale differences between the protein and gene channels. `zscore_combined` is kept because it carries a physical interpretation ("σ below the mean") that is easier to communicate.
+
+In practice the top-10s of the two files will overlap heavily; divergences happen further down the list and are a useful signal for case-by-case review.
+
+See the docstring at the top of `combined_score_analysis.py` for the exact implementation.
 
 ## Configuration knobs
 
