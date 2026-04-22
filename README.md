@@ -116,8 +116,28 @@ Run the combination script:
 python combined_score_analysis.py
 ```
 
-This will output a JSON file containing the combined results, located at:
-`./matrices/drug_scores/combined_drugs.json`
+This writes two files to `./matrices/drug_scores/`:
+
+* `combined_drugs.json` — sorted ascending by z-score-averaged score (lowest = best, same convention as the raw channel scores).
+* `combined_drugs_rrf.json` — sorted descending by Reciprocal Rank Fusion (highest = best). Recommended as the final ranking.
+
+See the docstring at the top of `combined_score_analysis.py` for the math.
+
+## Configuration knobs
+
+The pipeline exposes three optional environment variables. All have sensible defaults, so `sh drug_prediction.sh` works unchanged.
+
+| Variable | Default | Values | Effect |
+| --- | --- | --- | --- |
+| `PENALIZE_HUB` | `log` | `log`, `linear`, `none` | Per-feature IDF weighting on the patient vectors. `log` is the standard smoothed IDF `log((N_C+1)/(df+1))+1`. `linear` reproduces the legacy `1/df`. `none` disables it. |
+| `DEGREE_SCOPE` | `targets` | `targets`, `all` | Which edges count towards the drug specificity prior `w_d = 1/√(out_degree+1)`. `targets` counts only edges to `:Compound`, `:Protein` and `:Gene` (recommended). `all` counts every label (legacy). |
+| `N_PERM` | `0` | non-negative integer | If > 0, `matmul.py` also writes a permutation-null z-score per drug to `<output>.z.json`. Shuffles only the ± signs on the patient's support, holding the support fixed. Complements the drug-size prior — large negative z means "sign alignment with this drug is much better than chance". 200–1000 is typical. |
+
+Example:
+
+```bash
+PENALIZE_HUB=log DEGREE_SCOPE=targets N_PERM=500 sh drug_prediction.sh
+```
 
 Investigate Neo4j Results
 MATCH path=(d:Compound)-[]-(p)-[]-(n:Patient) 
