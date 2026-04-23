@@ -48,6 +48,7 @@ def _resort(items: list, idc: np.ndarray) -> list:
 
 def score_all(
     patient_feature_matrix: np.ndarray,   # (Q, F)
+    patient_normal_feature_matrix: np.ndarray,  # (Q, F)
     feature_drug_matrix: np.ndarray,      # (F, D)
     drug_weights: np.ndarray,             # (D,)
 ) -> np.ndarray:
@@ -55,7 +56,7 @@ def score_all(
     # Apply the drug prior as a column-wise scaling of the F x D matrix,
     # then a single matmul. Broadcasting is aligned on the drug axis.
     weighted = feature_drug_matrix * drug_weights[None, :]    # (F, D)
-    return patient_feature_matrix @ weighted                  # (Q, D)
+    return patient_feature_matrix @ weighted  + patient_normal_feature_matrix @ np.abs(weighted)             # (Q, D)
 
 
 def permutation_z(
@@ -80,6 +81,7 @@ def permutation_z(
     """
     rng = np.random.default_rng(seed)
     patient_row = patient_row.astype(np.float64, copy=True)
+    
     weighted = feature_drug_matrix * drug_weights[None, :]    # (F, D)
 
     observed = patient_row @ weighted                         # (D,)
@@ -125,15 +127,18 @@ def main() -> None:
     args = parse_args()
     os.makedirs(os.path.expanduser("./matrices/drug_scores"), exist_ok=True)
 
-    patient_feature_matrix = np.load(os.path.expanduser(args.patient_feature_matrix))
+    patient_feature_matrix = np.load(os.path.expanduser(args.patient_feature_matrix)) * 1 # factor 10 more important than unaffected proteins/genes
+    patient_normal_feature_matrix = (patient_feature_matrix == 0).astype(int) * 0
     drug_weights = np.load(os.path.expanduser(args.drug_weights))
+    
+    #drug_weights = np.ones_like(drug_weights) 
     feature_drug_matrix = np.load(os.path.expanduser(args.feature_drug_matrix)).T
 
     print("Patient-feature matrix:", patient_feature_matrix.shape)
     print("Feature-drug matrix:   ", feature_drug_matrix.shape)
     print("Drug weights:          ", drug_weights.shape)
 
-    S = score_all(patient_feature_matrix, feature_drug_matrix, drug_weights)
+    S = score_all(patient_feature_matrix,patient_normal_feature_matrix, feature_drug_matrix, drug_weights)
     print("Patient-drug score matrix:", S.shape)
 
     # One patient for now; this indexes row 0 deliberately. See README.

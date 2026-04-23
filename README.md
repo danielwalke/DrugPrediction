@@ -214,3 +214,10 @@ RETURN path
 MATCH path=(d:Compound)-[]-(p)-[]-(n:Patient) 
 WHERE d.name = "Pyrophosphate 2-" AND ("Gene" IN labels(p) OR "Protein" IN labels(p)) 
 RETURN path
+
+
+## Scoring params
+1) Side effect penalization with patient_normal_feature_matrix = (patient_feature_matrix == 0).astype(int) * 0
+2) Limiting  number of affected genes and proteins to only those where gene and proteins show similar expression trends: "MATCH (p:Patient)-[r]->(q:Gene) MATCH (p)-[ra]-(a:Protein)--(q) WHERE r.regulation = ra.regulation"
+3) Down-weighting drugs with many interactions to other compounds and chemicals besides RESEMBLES interactions
+4) Weighting the influence of dysregulated proteins and genes higher than the physiolgoically expressed ones

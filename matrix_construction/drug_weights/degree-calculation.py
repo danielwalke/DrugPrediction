@@ -36,17 +36,19 @@ if DEGREE_SCOPE not in {"targets", "all"}:
         f"DEGREE_SCOPE must be one of targets|all, got {DEGREE_SCOPE!r}"
     )
 
-
+"""
+   + COUNT { (c)-[]->(:Protein)  }
+   + COUNT { (c)-[]->(:Gene)     }    
+   
+   + COUNT { (:Protein)-[]->(c)  }
+   + COUNT { (:Gene)-[]->(c)     }                
+"""
 QUERY_TARGETS = """
 UNWIND $names AS comp_name
 MATCH (c:Compound {name: comp_name})
 WITH c, comp_name,
-     COUNT { (c)-[]->(:Compound) }
-   + COUNT { (c)-[]->(:Protein)  }
-   + COUNT { (c)-[]->(:Gene)     }                  AS out_degree,
-     COUNT { (:Compound)-[]->(c) }
-   + COUNT { (:Protein)-[]->(c)  }
-   + COUNT { (:Gene)-[]->(c)     }                  AS in_degree
+     COUNT { (c)-[r]->(:Compound) WHERE type(r) <> 'RESEMBLES_CrC' } + COUNT { (c)-[r]->(:Chemical) WHERE type(r) <> 'RESEMBLES_CrC' } AS out_degree,
+     COUNT { (:Compound)-[r]->(c) WHERE type(r) <> 'RESEMBLES_CrC' } + COUNT { (:Chemical)-[r]->(c) WHERE type(r) <> 'RESEMBLES_CrC' } AS in_degree
 RETURN comp_name,
        in_degree,
        out_degree,

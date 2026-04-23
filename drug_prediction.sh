@@ -109,7 +109,7 @@
 #
 set -euo pipefail
 
-: "${PENALIZE_HUB:=log}"
+: "${PENALIZE_HUB:=none}"
 : "${DEGREE_SCOPE:=targets}"
 : "${N_PERM:=0}"
 

@@ -48,7 +48,9 @@ with open(os.path.expanduser("./matrices/protein_drug/protein_cols.json")) as f:
 
 query = f"""
 MATCH (c:Compound) WITH count(c) AS N_C
-MATCH (p:Patient)-[r]->(q:Protein)
+MATCH (p:Patient)-[r]-(q:Protein)
+MATCH (p)-[ra]-(g:Gene)--(q) 
+WHERE r.regulation = ra.regulation
 WITH p, q, N_C,
     CASE r.regulation
         WHEN 'Up'   THEN  1.0
@@ -66,13 +68,12 @@ print(f"PENALIZE_HUB={PENALIZE_HUB}")
 patient_protein_matrix = []
 with driver.session() as session:
     result = session.run(query).to_df().dropna()
-
+print(result.head())
 for patient_name, df_group in result.groupby("patient_name"):
     protein_name_to_weight = dict(zip(df_group["protein_name"], df_group["weight"]))
     patient_protein_matrix.append(
         [protein_name_to_weight.get(name, 0) for name in protein_rows]
     )
-
 np.save(
     os.path.expanduser("./matrices/patient_protein/patient_protein_matrix.npy"),
     np.array(patient_protein_matrix),

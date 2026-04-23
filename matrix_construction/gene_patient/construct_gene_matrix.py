@@ -32,6 +32,8 @@ with open(os.path.expanduser("./matrices/gene_drug/gene_cols.json")) as f:
 query = f"""
 MATCH (c:Compound) WITH count(c) AS N_C
 MATCH (p:Patient)-[r]->(q:Gene)
+MATCH (p)-[ra]-(a:Protein)--(q) 
+WHERE r.regulation = ra.regulation
 WITH p, q, N_C,
     CASE r.regulation
         WHEN 'Up'   THEN  1.0
@@ -49,13 +51,13 @@ print(f"PENALIZE_HUB={PENALIZE_HUB}")
 patient_gene_matrix = []
 with driver.session() as session:
     result = session.run(query).to_df().dropna()
-
+print(result.head())
 for patient_name, df_group in result.groupby("patient_name"):
     gene_name_to_weight = dict(zip(df_group["gene_name"], df_group["weight"]))
     patient_gene_matrix.append(
         [gene_name_to_weight.get(name, 0) for name in gene_rows]
     )
-
+print(np.array(patient_gene_matrix).shape)
 np.save(
     os.path.expanduser("./matrices/patient_gene/patient_gene_matrix.npy"),
     np.array(patient_gene_matrix),
