@@ -217,7 +217,7 @@ RETURN path
 
 
 ## Scoring params
-1) Side effect penalization with patient_normal_feature_matrix = (patient_feature_matrix == 0).astype(int) * 0
-2) Limiting  number of affected genes and proteins to only those where gene and proteins show similar expression trends: "MATCH (p:Patient)-[r]->(q:Gene) MATCH (p)-[ra]-(a:Protein)--(q) WHERE r.regulation = ra.regulation"
-3) Down-weighting drugs with many interactions to other compounds and chemicals besides RESEMBLES interactions
-4) Weighting the influence of dysregulated proteins and genes higher than the physiolgoically expressed ones
+1) Default not: Side effect penalization with patient_normal_feature_matrix = (patient_feature_matrix == 0).astype(int) * 0 
+2) Default yes: Limiting  number of affected genes and proteins to only those where gene and proteins show similar expression trends: "MATCH (p:Patient)-[r]->(q:Gene) MATCH (p)-[ra]-(a:Protein)--(q) WHERE r.regulation = ra.regulation"
+3) Default yes: Down-weighting drugs with many interactions to other compounds and chemicals besides RESEMBLES interactions
+4) Default not: Weighting the influence of dysregulated proteins and genes higher than the physiolgoically expressed ones
