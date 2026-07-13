@@ -36,15 +36,15 @@ sh pharmebinet/start_db.sh
 
 ```bash
 CALL gds.graph.project.cypher(
-  'compoundNeighborhood',
-  'MATCH (n) WHERE n:Compound OR EXISTS { (n)--(:Compound) } RETURN id(n) AS id',
-  'MATCH (n)-[r]->(m) WHERE (n:Compound OR EXISTS { (n)--(:Compound) }) AND (m:Compound OR EXISTS { (m)--(:Compound) }) RETURN id(n) AS source, id(m) AS target, type(r) AS type'
+  'compoundBipartiteGraph',
+  'MATCH (n) WHERE n:Compound OR n:Gene OR n:Protein RETURN id(n) AS id',
+  'MATCH (n)-[r]->(m) WHERE (n:Compound AND (m:Protein OR m:Gene)) OR ((n:Protein OR n:Gene) AND m:Compound) RETURN id(n) AS source, id(m) AS target, type(r) AS type'
 )
 YIELD graphName, nodeCount, relationshipCount
 ```
 
 ```bash
-CALL gds.betweenness.write('compoundNeighborhood', {
+CALL gds.betweenness.write('compoundBipartiteGraph', {
   writeProperty: 'betweennessCentrality'
 })
 YIELD nodePropertiesWritten, computeMillis
