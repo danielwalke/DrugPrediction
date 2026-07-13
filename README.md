@@ -16,6 +16,8 @@ Before setting up the project, ensure you have downloaded the latest PharMeBINet
 
 * [PharMeBINet Download](https://pharmebi.net/#/download)
 
+
+
 ## Setup and Installation
 
 1. Create the database dump:
@@ -29,6 +31,24 @@ sh pharmebinet/create_db.sh
 ```bash
 sh pharmebinet/start_db.sh
 ```
+
+2.1 Go to localhost:7474, connect with bolt port localhost:7687 and login and then enter the following queries:
+
+```bash
+CALL gds.graph.project.cypher(
+  'compoundNeighborhood',
+  'MATCH (n) WHERE n:Compound OR EXISTS { (n)--(:Compound) } RETURN id(n) AS id',
+  'MATCH (n)-[r]->(m) WHERE (n:Compound OR EXISTS { (n)--(:Compound) }) AND (m:Compound OR EXISTS { (m)--(:Compound) }) RETURN id(n) AS source, id(m) AS target, type(r) AS type'
+)
+YIELD graphName, nodeCount, relationshipCount
+```
+
+```bash
+CALL gds.betweenness.write('compoundNeighborhood', {
+  writeProperty: 'betweennessCentrality'
+})
+YIELD nodePropertiesWritten, computeMillis
+``
 
 3. Set up the Python virtual environment and install the required dependencies:
 
@@ -218,6 +238,6 @@ RETURN path
 
 ## Scoring params
 1) Default not: Side effect penalization with patient_normal_feature_matrix = (patient_feature_matrix == 0).astype(int) * 0 
-2) Default yes: Limiting  number of affected genes and proteins to only those where gene and proteins show similar expression trends: "MATCH (p:Patient)-[r]->(q:Gene) MATCH (p)-[ra]-(a:Protein)--(q) WHERE r.regulation = ra.regulation"
+2) Default yes: Limiting  number of affected genes and proteins to only those where gene and proteins show similar expression trends: "MATCH (p:Patient {{name: "Patient3"}})-[r]->(q:Gene) MATCH (p)-[ra]-(a:Protein)--(q) WHERE r.regulation = ra.regulation"
 3) Default yes: Down-weighting drugs with many interactions to other compounds and chemicals besides RESEMBLES interactions
 4) Default not: Weighting the influence of dysregulated proteins and genes higher than the physiolgoically expressed ones
