@@ -38,7 +38,7 @@ sh pharmebinet/start_db.sh
 CALL gds.graph.project.cypher(
   'compoundBipartiteGraph',
   'MATCH (n) WHERE n:Compound OR n:Gene OR n:Protein RETURN id(n) AS id',
-  'MATCH (n)-[r]->(m) WHERE (n:Compound AND (m:Protein OR m:Gene)) OR ((n:Protein OR n:Gene) AND m:Compound) RETURN id(n) AS source, id(m) AS target, type(r) AS type'
+  'MATCH (n:Compound)-[r]-(m) WHERE m:Protein OR m:Gene UNWIND [{source: id(n), target: id(m)}, {source: id(m), target: id(n)}] AS edge RETURN edge.source AS source, edge.target AS target, type(r) AS type'
 )
 YIELD graphName, nodeCount, relationshipCount
 ```
