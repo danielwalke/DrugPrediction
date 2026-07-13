@@ -48,7 +48,7 @@ CALL gds.betweenness.write('compoundNeighborhood', {
   writeProperty: 'betweennessCentrality'
 })
 YIELD nodePropertiesWritten, computeMillis
-``
+```
 
 3. Set up the Python virtual environment and install the required dependencies:
 
